@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Bats HIIT</string>
+    <string name="title_activity_hiitrun">HIIT!</string>
+    <string name="go_string">Go!</string>
+    <string name="zero_string">0</string>
+    <string name="intv_string">intervals remaining</string>
+    <string name="block_string">blocks remaining</string>
+	<string name="hello_string">Welcome!</string>
+	<string name="rest_string">Rest!</string>
+	<string name="second_string">seconds remaining</string>
+	<string name="work_time">Work [s]</string>
+	<string name="break_time">Break [s]</string>
+	<string name="rest_time">Rest [s]</string>
+	<string name="num_intv">Intervals per block</string>
+	<string name="num_block">Blocks</string>
+	<string name="work_dflt">50</string>
+	<string name="break_dflt">10</string>
+	<string name="rest_dflt">60</string>
+	<string name="intv_dflt">7</string>
+	<string name="block_dflt">3</string>
+	<string name="keep_awake">Keep screen on</string>
+    
+</resources>
