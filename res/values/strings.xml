@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Bats HIIT</string>
+    <string name="app_name">Bats! HIIT</string>
     <string name="title_activity_hiitrun">HIIT!</string>
     <string name="go_string">Go!</string>
     <string name="zero_string">0</string>
     <string name="intv_string">intervals remaining</string>
     <string name="block_string">blocks remaining</string>
-	<string name="hello_string">Welcome!</string>
 	<string name="rest_string">Rest!</string>
 	<string name="second_string">seconds remaining</string>
 	<string name="work_time">Work [s]</string>
@@ -20,6 +19,6 @@
 	<string name="rest_dflt">60</string>
 	<string name="intv_dflt">7</string>
 	<string name="block_dflt">3</string>
-	<string name="keep_awake">Keep screen on</string>
+	<!-- <string name="keep_awake">Keep screen on</string> -->
     
 </resources>

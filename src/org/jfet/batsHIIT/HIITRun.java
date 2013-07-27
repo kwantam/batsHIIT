@@ -12,7 +12,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
+//import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -44,9 +44,10 @@ public class HIITRun extends Activity {
     private static enum HIITState { WORK, BREAK, REST };
     
     private class HIITRunner extends Thread {
-    //Thread hiitRunner = new Thread() {
+    	// volatile because the UI thread signals us via this flag
     	private volatile boolean runLoop;
     	
+    	// signal from UI thread to shut down
     	public void stopRunner() {
     		this.runLoop = false;
     	}
@@ -72,11 +73,11 @@ public class HIITRun extends Activity {
         										 HIITRun.this.chirp);    		
            	
            	// start out with 5 warning beeps, then the workout begins
-           	for (intvRemaining = 5; intvRemaining > 0; intvRemaining--)
+           	for (intvRemaining = 5; (intvRemaining > 0) & runLoop; intvRemaining--)
            		try {
            			HIITRun.this.sndMan.playSound(HIITRun.this.beep1);
            			Thread.sleep(1000);
-           		} catch (InterruptedException ex) { continue; }
+           		} catch (InterruptedException ex) { return; }
 
            	lastWakeup = System.nanoTime() - sleepTarget;
     		while (runLoop) {
@@ -125,30 +126,45 @@ public class HIITRun extends Activity {
     				if (timeRemaining < 5) HIITRun.this.sndMan.playSound(HIITRun.this.chirp);
     			}
     			
+    			/*
     			// delay-locked loop
     			// reference delay is 1 second (sleepTarget, in nanoseconds)
     			// measure delay each cycle by looking at new value from System.nanoTime()
     			// integrator:
-    			//   y[n] = y[n-1] + x[n]/30
-    			//   Y = Y*z^-1 + X/30
-    			//   Y/X = 1/30/(1 - z^-1)
+    			//   y[n] = y[n-1] + x[n]/ki
+    			//   Y = Y*z^-1 + X/ki
+    			//   Y/X = 1/ki/(1 - z^-1)
     			// feedforward (zero)
-    			//   z[n] = x[n]/5
-    			//   Z/X = 1/5
+    			//   z[n] = x[n]/kz
+    			//   Z/X = 1/kz
     			// total transfer function
     			//   w[n] = y[n] + z[n]
     			//   W/X = Y/X + Z/X
-    			//       = 1/30/(1 - z^-1) + 1/5
-    			//		 = (6*(1 - z^-1) + 1)/30/(1 - z^-1)
-    			wakeupError = sleepTarget - thisWakeup + lastWakeup;		// error signal
-    			sleepDelay = sleepDelay + wakeupError / 30;					// integrator strength 1/30
-    			wakeupError = sleepDelay + (wakeupError / 5);				// feedforward strength 1/5
+    			//       = 1/ki/(1 - z^-1) + 1/kz
+    			//		 = (1 + (ki*(1 - z^-1))/kz)/(ki*(1 - z^-1))
+    			//		 = (z + (ki*(z - 1)/kz) / (ki*(z - 1))
+    			//		 = ((ki+kz)*z/kz - ki/kz) / (ki*(z - 1))
+    			//		 = ((ki+kz)*z - ki) / (ki*kz*(z -1))
+    			//		 = ((ki+kz)/ki/kz - ki*z^-1/ki/kz) / (1 - z^-1)
+    			// kz needs to be somewhat greater than 1 for stability (need high frequency gain < 0dB)
+    			// ki wants to be bigger than kz, but not too much s.t. loop bandwidth is relatively high
+    			// kz = 3, ki = 5 should be stable and should give decent loop bandwidth
+    			// if we're willing to add another singularity (pole at higher frequency),
+    			// we could make kz < 1 and have very good transient response, e.g.,
+    			// responding to the additional delay that results from playing sounds
+    			// but we already do a pretty good job in this respect so probably it's good enough
+    			// it would be nice to have higher bandwidth to push down noise but we do a good job at
+    			// low frequency, viz., taking care of offset from our own code and slowly varying system load
+    			*/
+    			wakeupError = sleepTarget - (thisWakeup - lastWakeup);		// error signal
+    			// log the error; how well are we doing?
+    			//Log.w("org.jfet.batsHIIT",String.format("dly %f",(float) wakeupError/(float) sleepTarget));
+    			sleepDelay = sleepDelay + (wakeupError / 5);				// integrator
+    			wakeupError = sleepDelay + (wakeupError / 3);				// feedforward zero
     			lastWakeup = thisWakeup;									// save most recent wakeup
-    			
-    			//Log.w("org.jfet.batsHIIT",String.format("dly %d",wakeupError));
 
             	try { Thread.sleep(wakeupError / 1000000L); }	// sleep 1 second
-            	catch (InterruptedException ex) { continue; }
+            	catch (InterruptedException ex) { return; }
             }
     		
     		HIITRun.this.uiHandler.obtainMessage(4).sendToTarget();
