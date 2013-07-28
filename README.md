@@ -38,15 +38,15 @@ To ensure that your workout is accurately timed, Bats! HIIT implements a feedbac
 
 When you're exercising, you want to be able to see your progress without unlocking your screen. Bats! HIIT prevents your screen from turning off, though it does allow it to dim for power savings. This lets you know at a glance how you're doing.
 
+### Save/recall workout
+
+You can save/recall/delete stored workouts. "Last workout" is automatically created whenever you do a workout, and is restored when the app is next started.
+
 ## Limitations
 
 ### No resume
 
 If you are in the middle of your workout and Bats! HIIT is interrupted, your progress is lost and you are returned to the home screen. This is because I am extremely lazy and my threading code is super naive at the moment. I will fix this in the future.
-
-### No save/recall workout
-
-For now, you cannot save or load previous workout configurations. This is next on my list of crap to add. Note that the most recently used settings are automatically saved and restored.
 
 ## License
 
