@@ -19,6 +19,11 @@
 	<string name="rest_dflt">60</string>
 	<string name="intv_dflt">7</string>
 	<string name="block_dflt">3</string>
+	<string name="save_string">Save</string>
+	<string name="load_string">Load</string>
+	<string name="del_string">Delete</string>
+	<string name="saveAs_string">Save As&#8230;</string>
+	<string name="lastWorkout">Last workout</string>
 	<!-- <string name="keep_awake">Keep screen on</string> -->
     
 </resources>

@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_layout"
     >
 <LinearLayout
     android:layout_width="match_parent"
@@ -113,11 +114,91 @@
         />
 </LinearLayout>
  -->
-    <Button android:layout_width="wrap_content"
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <View style="@style/SpacerW1" />
+    <Button android:layout_width="0dp"
+        android:layout_weight="3"
         android:layout_height="wrap_content"
         android:onClick="hiitRun"
         android:text="@string/go_string"
-        android:textSize="36sp"
+        android:textSize="48sp"
         />
-    
+    <View style="@style/SpacerW1" />
+</LinearLayout>
+
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Divider" />
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    <EditText android:id="@+id/edit_sName"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/saveAs_string" />
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:onClick="saveButton"
+        android:text="@string/save_string"
+        android:textSize="18sp"
+        />
+</LinearLayout>
+
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    <Spinner
+        android:id="@+id/spin_lName"
+        android:layout_width="0dp"
+        android:layout_weight="3"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:onClick="loadButton"
+        android:text="@string/load_string"
+        android:textSize="18sp"
+        />
+</LinearLayout>
+
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+	<View style="@style/SpacerW1" />
+	<View style="@style/SpacerW1" />
+	<View style="@style/SpacerW1" />
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:onClick="delButton"
+        android:text="@string/del_string"
+        android:textSize="18sp"
+        />
+</LinearLayout>
 </LinearLayout>

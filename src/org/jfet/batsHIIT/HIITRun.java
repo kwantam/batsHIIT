@@ -12,11 +12,11 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NavUtils;
-//import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+//import android.util.Log;
 
 public class HIITRun extends Activity {
     // sound manager
