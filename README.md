@@ -46,7 +46,7 @@ If you are in the middle of your workout and Bats! HIIT is interrupted, your pro
 
 ### No save/recall workout
 
-For now, you cannot save or load previous workout configurations. This is next on my list of crap to add.
+For now, you cannot save or load previous workout configurations. This is next on my list of crap to add. Note that the most recently used settings are automatically saved and restored.
 
 ## License
 

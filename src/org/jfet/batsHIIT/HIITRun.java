@@ -49,13 +49,13 @@ public class HIITRun extends Activity {
     	
     	// signal from UI thread to shut down
     	public void stopRunner() {
-    		this.runLoop = false;
+    		runLoop = false;
     	}
     	
     	@Override
     	public void run() {
     		// run the loop
-       		this.runLoop = true;
+       		runLoop = true;
        		// initialize state machine
     		int timeRemaining = HIITRun.this.restSeconds;
     		int blockRemaining = HIITRun.this.blockCount;
@@ -181,31 +181,32 @@ public class HIITRun extends Activity {
         setupActionBar();
         
         // create the sound manager instance
-		this.sndMan = new SoundManager(this);
+		sndMan = new SoundManager(this);
         // load the sounds to initialize the sound manager
-        this.beep1 = sndMan.loadSound(beep1Snd);
-        this.beep2 = sndMan.loadSound(beep2Snd);
-        this.chirp = sndMan.loadSound(chirpSnd);
+        beep1 = sndMan.loadSound(beep1Snd);
+        beep2 = sndMan.loadSound(beep2Snd);
+        chirp = sndMan.loadSound(chirpSnd);
         
         // set up the workout parameters
-        Intent itt = this.getIntent();
-        this.workSeconds = itt.getIntExtra(HIITMain.M_WORK, 50);
-        this.breakSeconds = itt.getIntExtra(HIITMain.M_BREAK, 10);
-        this.restSeconds = itt.getIntExtra(HIITMain.M_REST, 60);
-        this.intervalCount = itt.getIntExtra(HIITMain.M_INTV, 7);
-        this.blockCount = itt.getIntExtra(HIITMain.M_BLOCK, 3);
+        Intent itt = getIntent();
+        workSeconds = itt.getIntExtra(HIITMain.M_WORK, Integer.parseInt(getString(R.string.work_dflt)));
+        breakSeconds = itt.getIntExtra(HIITMain.M_BREAK, Integer.parseInt(getString(R.string.break_dflt)));
+        restSeconds = itt.getIntExtra(HIITMain.M_REST, Integer.parseInt(getString(R.string.rest_dflt)));
+        intervalCount = itt.getIntExtra(HIITMain.M_INTV, Integer.parseInt(getString(R.string.intv_dflt)));
+        blockCount = itt.getIntExtra(HIITMain.M_BLOCK, Integer.parseInt(getString(R.string.block_dflt)));
 
         // make sure the screen stays on through the workout
         // this works, but always keeps the screen at 100% brightness
-        //this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        PowerManager pm = (PowerManager) this.getSystemService(POWER_SERVICE);
-        this.scrUnLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
-        								PowerManager.ON_AFTER_RELEASE     ,
-        						   		"org.jfet.batsHIIT.HIITRun.scrUnLock");
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        scrUnLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
+        						  |PowerManager.ON_AFTER_RELEASE
+        						  ,"org.jfet.batsHIIT.HIITRun.scrUnLock"
+        						  );
         scrUnLock.acquire();
 
         // create a handler for hiitRunner to send us UI updates
-        this.uiHandler = new Handler(Looper.getMainLooper()) {
+        uiHandler = new Handler(Looper.getMainLooper()) {
         	// handle the message from the hiitRunner thread
         	@Override
         	public void handleMessage (Message m) {
@@ -256,7 +257,7 @@ public class HIITRun extends Activity {
         	}
         };
 
-        this.uiHandler.obtainMessage(2,0,this.blockCount).sendToTarget();
+        uiHandler.obtainMessage(2,0,blockCount).sendToTarget();
         hiitRunner = new HIITRunner();
         hiitRunner.start();
 	}
@@ -268,7 +269,7 @@ public class HIITRun extends Activity {
 		super.onPause();
 		hiitRunner.stopRunner();
 		hiitRunner.interrupt();
-		this.scrUnLock.release();
+		scrUnLock.release();
 		super.onBackPressed();
 	}
 	
@@ -291,8 +292,8 @@ public class HIITRun extends Activity {
             return super.onOptionsItemSelected(item);
     }
 
-    public void playBeep1 (View view) { sndMan.playSound(this.beep1); }
-    public void playBeep2 (View view) { sndMan.playSound(this.beep2); }
-    public void playChirp (View view) { sndMan.playSound(this.chirp); }
+    public void playBeep1 (View view) { sndMan.playSound(beep1); }
+    public void playBeep2 (View view) { sndMan.playSound(beep2); }
+    public void playChirp (View view) { sndMan.playSound(chirp); }
 
 }
