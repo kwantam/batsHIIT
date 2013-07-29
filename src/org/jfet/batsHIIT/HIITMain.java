@@ -2,16 +2,20 @@ package org.jfet.batsHIIT;
 
 import java.util.Scanner;
 import java.util.regex.Pattern;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class HIITMain extends Activity {
 	// keys for the intent we send to Run
@@ -25,27 +29,82 @@ public class HIITMain extends Activity {
 	private EditText eRest;
 	private EditText eIntv;
 	private EditText eBlock;
+	private HIITInputWatcher hiWatcher;
+	private int iWork;
+	private int iBreak;
+	private int iRest;
+	private int iIntv;
+	private int iBlock;
+	
+	private class HIITInputWatcher implements TextWatcher {
+		// need a reference to the parent activity
+		// so we can tell it to recompute the workout time
+		private final HIITMain parentActivity;
+		public HIITInputWatcher (HIITMain p) { parentActivity = p; }
+		
+		@Override
+		public void afterTextChanged (Editable s) { parentActivity.recomputeHIITTime(); }
+		
+		// have to implement these for a full TextWatcher implementation, but we don't care about them
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) { return; }
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) { return; }
+		
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		// always required first
-		setupView();							// set up the view
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);	// volume changes "music"
-	}
-	
-	// set up the view using the hiitmain XML file, then
-	// save off the view IDs for the relevant fields
-	private void setupView() {
+
+		// set up the view, populate the elements
 		setContentView(R.layout.activity_hiitmain);
 		eWork = (EditText) findViewById(R.id.edit_work);
 		eBreak = (EditText) findViewById(R.id.edit_break);
 		eRest = (EditText) findViewById(R.id.edit_rest);
 		eIntv = (EditText) findViewById(R.id.edit_intv);
 		eBlock = (EditText) findViewById(R.id.edit_block);
+		hiWatcher = new HIITInputWatcher(this);
+		setupListener(true);
+
 		restoreSettings(getString(R.string.lastWorkout));
+
 		populateLoadSpinner();
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);	// volume changes "music"
 	}
 	
+	private void setupListener (final Boolean set) {
+		if (set) {
+			eWork.addTextChangedListener(hiWatcher);
+			eBreak.addTextChangedListener(hiWatcher);
+			eRest.addTextChangedListener(hiWatcher);
+			eBlock.addTextChangedListener(hiWatcher);
+			eIntv.addTextChangedListener(hiWatcher);
+		} else {
+			eWork.removeTextChangedListener(hiWatcher);
+			eBreak.removeTextChangedListener(hiWatcher);
+			eRest.removeTextChangedListener(hiWatcher);
+			eBlock.removeTextChangedListener(hiWatcher);
+			eIntv.removeTextChangedListener(hiWatcher);
+		}
+	}
+	
+	private void recomputeHIITTime() {
+    	// catch exceptions in converting user input; if anything fails, reset to last known good settings
+    	try { 
+    		convertSettings();
+    	} catch (NumberFormatException ex) {
+    		return;
+    	}
+    	
+    	final int totalTime = (1 + iBlock)*iRest + iBlock*iIntv*(iWork+iBreak);
+    	
+    	((TextView) findViewById(R.id.hiit_time)).setText(
+    			String.format("%d:%02d"
+    						 ,totalTime / 60
+    						 ,totalTime % 60));
+	}
+
 	private void populateLoadSpinner() {
 		// retrieve the preferences, and get all the keys
     	final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
@@ -65,36 +124,37 @@ public class HIITMain extends Activity {
     	}
 	}
 
-/*
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.hiitmain, menu);
-		return true;
+	private void convertSettings() throws NumberFormatException {
+		try {	// if this breaks...
+			// (note) we do not allow values less than 1 for these!
+			// silently set the converted representation to 1
+			iWork = Math.max(Integer.parseInt(eWork.getText().toString()),1);
+			iBreak = Math.max(Integer.parseInt(eBreak.getText().toString()),1);
+			iRest = Math.max(Integer.parseInt(eRest.getText().toString()),1);
+			iIntv = Math.max(Integer.parseInt(eIntv.getText().toString()),1);
+			iBlock = Math.max(Integer.parseInt(eBlock.getText().toString()),1);
+		} catch (NumberFormatException ex) {
+			// ...pass the buck
+			throw ex;
+		}
 	}
-*/
 	
     public void hiitRun (View view) {
-    	// catch exceptions in converting user input; if anything fails, just reset the view
-    	int i_work, i_break, i_rest, i_intv, i_block;
+    	// catch exceptions in converting user input; if anything fails, reset to last known good settings
     	try { 
-    		i_work = Integer.parseInt(eWork.getText().toString());
-    		i_break = Integer.parseInt(eBreak.getText().toString());
-    		i_rest = Integer.parseInt(eRest.getText().toString());
-    		i_intv = Integer.parseInt(eIntv.getText().toString());
-    		i_block = Integer.parseInt(eBlock.getText().toString());
+    		convertSettings();
     	} catch (NumberFormatException ex) {
-    		setupView();
+    		restoreSettings(getString(R.string.lastWorkout));
     		return;
     	}
 
     	// build up the intent
     	final Intent intent = new Intent (this, HIITRun.class);
-   		intent.putExtra(M_WORK,i_work);
-    	intent.putExtra(M_BREAK,i_break);
-    	intent.putExtra(M_REST,i_rest);
-    	intent.putExtra(M_INTV,i_intv);
-    	intent.putExtra(M_BLOCK,i_block);
+   		intent.putExtra(M_WORK,iWork);
+    	intent.putExtra(M_BREAK,iBreak);
+    	intent.putExtra(M_REST,iRest);
+    	intent.putExtra(M_INTV,iIntv);
+    	intent.putExtra(M_BLOCK,iBlock);
 
     	// if we got here, these settings are reasonably sensible
     	saveSettings(getString(R.string.lastWorkout));
@@ -124,7 +184,7 @@ public class HIITMain extends Activity {
     	pEdit.commit();
 	}
 	
-	private void restoreSettings(String sName) {
+	private void restoreSettings(final String sName) {
 		final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		final String dfltSettings = String.format("%s:%s:%s:%s:%s"
 												 ,getString(R.string.work_dflt)
@@ -140,11 +200,16 @@ public class HIITMain extends Activity {
 		final Scanner setScan = new Scanner(setString);
 		// yes yes yes now we have two problems
 		setScan.useDelimiter(Pattern.compile(":"));
+		
+		// make sure we don't do a bunch of unnecessary callbacks when we change these
+		setupListener(false);
 		eWork.setText(setScan.next());
 		eBreak.setText(setScan.next());
 		eRest.setText(setScan.next());
 		eIntv.setText(setScan.next());
 		eBlock.setText(setScan.next());
+		recomputeHIITTime();
+		setupListener(true);
 	}
 	
 	public void saveButton (View view) {

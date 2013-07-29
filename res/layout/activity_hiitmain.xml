@@ -118,6 +118,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
+	<TextView 
+    	android:layout_width="0dp"
+    	android:layout_weight="10"
+    	android:layout_height="wrap_content"
+    	android:text="@string/hiit_time_str"
+    	android:gravity="right"
+    	android:textSize="24sp"
+    />
+    <View style="@style/SpacerW1" />
+	<TextView 
+    	android:layout_width="0dp"
+    	android:layout_weight="10"
+    	android:layout_height="wrap_content"
+    	android:text="@string/zero_string"
+    	android:id="@+id/hiit_time"
+    	android:gravity="left"
+    	android:textSize="24sp"
+    />
+</LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
     <View style="@style/SpacerW1" />
     <Button android:layout_width="0dp"
         android:layout_weight="3"
@@ -158,8 +181,6 @@
 </LinearLayout>
 
 <View style="@style/Spacer" />
-<View style="@style/Spacer" />
-<View style="@style/Spacer" />
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -181,8 +202,6 @@
         />
 </LinearLayout>
 
-<View style="@style/Spacer" />
-<View style="@style/Spacer" />
 <View style="@style/Spacer" />
 
 <LinearLayout

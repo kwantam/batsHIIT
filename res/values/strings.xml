@@ -24,6 +24,7 @@
 	<string name="del_string">Delete</string>
 	<string name="saveAs_string">Save As&#8230;</string>
 	<string name="lastWorkout">Last workout</string>
+	<string name="hiit_time_str">Workout time:</string>
 	<!-- <string name="keep_awake">Keep screen on</string> -->
     
 </resources>
