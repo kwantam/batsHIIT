@@ -28,12 +28,6 @@ Bats! HIIT always gives a warning consisting of 4 short chirps when you're about
 
 During work intervals, your phone's screen will be green. In breaks, the screen will turn yellow. Rest is indicated by a red background. Your phone will also tell you how long is left in the present sub-interval and how many work/break pairs and blocks remain.
 
-## Cool stuff you might care about
-
-### Delay locked loop
-
-To ensure that your workout is accurately timed, Bats! HIIT implements a feedback system called a [delay-locked loop](http://en.wikipedia.org/wiki/Delay-locked_loop). Every second, when Bats! HIIT wakes up to update the timer readout, it measures how long it was actually asleep and adjusts future delay intervals to hit the target 1-second sleep interval. In practice, this reduces short-term timing errors from more than 5% to about 0.2%; since the error is integrated over the life of your workout, the overall accuracy is two to three orders of magnitude better than the short-term errors.
-
 ### Screen lock
 
 When you're exercising, you want to be able to see your progress without unlocking your screen. Bats! HIIT prevents your screen from turning off, though it does allow it to dim for power savings. This lets you know at a glance how you're doing.
@@ -42,11 +36,13 @@ When you're exercising, you want to be able to see your progress without unlocki
 
 You can save/recall/delete stored workouts. "Last workout" is automatically created whenever you do a workout, and is restored when the app is next started.
 
-## Limitations
+### Pause workout
 
-### No resume
+If Bats! HIIT loses focus during a workout, your workout will be paused and will resume when Bats! HIIT resumes.
 
-If you are in the middle of your workout and Bats! HIIT is interrupted, your progress is lost and you are returned to the home screen. This is because I am extremely lazy and my threading code is super naive at the moment. I will fix this in the future.
+### Delay locked loop
+
+To ensure that your workout is accurately timed, Bats! HIIT implements a feedback system called a [delay-locked loop](http://en.wikipedia.org/wiki/Delay-locked_loop). Every second, when Bats! HIIT wakes up to update the timer readout, it measures how long it was actually asleep and adjusts future delay intervals to hit the target 1-second sleep interval. In practice, this reduces short-term timing errors from more than 5% to about 0.2%; since the error is integrated over the life of your workout, the overall accuracy is two to three orders of magnitude better than the short-term errors.
 
 ## License
 

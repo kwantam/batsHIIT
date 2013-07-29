@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-//import android.util.Log;
 
 public class HIITRun extends Activity {
     // sound manager
@@ -46,16 +45,33 @@ public class HIITRun extends Activity {
     private class HIITRunner extends Thread {
     	// volatile because the UI thread signals us via this flag
     	private volatile boolean runLoop;
+    	private volatile boolean continueLoop;
     	
     	// signal from UI thread to shut down
     	public void stopRunner() {
+    		continueLoop = false;
+    	}
+    	
+    	public void pauseRunner() {
     		runLoop = false;
+    	}
+    	
+    	public void resumeRunner() {
+    		runLoop = true;
+    	}
+    	
+    	private void hangThread() {
+    		synchronized (HIITRun.this) {
+    			while(!runLoop)
+    				try { HIITRun.this.wait(); } catch (InterruptedException ex) { continue; }
+    		}
     	}
     	
     	@Override
     	public void run() {
-    		// run the loop
+    		// don't run the loop until we're told to start!
        		runLoop = true;
+       		continueLoop = true;
        		// initialize state machine
     		int timeRemaining = HIITRun.this.restSeconds;
     		int blockRemaining = HIITRun.this.blockCount;
@@ -68,19 +84,33 @@ public class HIITRun extends Activity {
     		long lastWakeup;
     		long thisWakeup;
 
+
            	HIITRun.this.sndMan.pauseUntilLoaded(HIITRun.this.beep1 +
            										 HIITRun.this.beep2 +
         										 HIITRun.this.chirp);    		
            	
            	// start out with 5 warning beeps, then the workout begins
-           	for (intvRemaining = 5; (intvRemaining > 0) & runLoop; intvRemaining--)
+           	for (intvRemaining = 5; (intvRemaining > 0); intvRemaining--) {
+           		// every iteration, check whether we should be pausing or dying
+           		if (!runLoop) hangThread();
+           		if (!continueLoop) return;
+
            		try {
            			HIITRun.this.sndMan.playSound(HIITRun.this.beep1);
            			Thread.sleep(1000);
-           		} catch (InterruptedException ex) { return; }
+           		} catch (InterruptedException ex) { continue; }
+           	}
 
            	lastWakeup = System.nanoTime() - sleepTarget;
-    		while (runLoop) {
+    		while (true) {
+    			// every iteration, check whether we should be pausing or dying
+    			if (!runLoop) {
+    				hangThread();
+    				// once we come back from a hung thread, make sure we don't blow up the delay-locked loop!
+    				lastWakeup = System.nanoTime() - sleepTarget;
+    			}
+    			if (!continueLoop) return;
+
     			thisWakeup = System.nanoTime();
     			if (timeRemaining == 1) { // finished this subinterval
     				switch (hiitState) {
@@ -111,6 +141,7 @@ public class HIITRun extends Activity {
     				// REST transition, either to WORK or done
     					if (blockRemaining == 0) {	// all done!
     						HIITRun.this.uiHandler.obtainMessage(4).sendToTarget();
+    						return;
     					} else {					// back to WORK
     						hiitState = HIITRun.HIITState.WORK;
     						timeRemaining = HIITRun.this.workSeconds;
@@ -158,19 +189,69 @@ public class HIITRun extends Activity {
     			*/
     			wakeupError = sleepTarget - (thisWakeup - lastWakeup);		// error signal
     			// log the error; how well are we doing?
-    			//Log.w("org.jfet.batsHIIT",String.format("dly %f",(float) wakeupError/(float) sleepTarget));
     			sleepDelay = sleepDelay + (wakeupError / 5);				// integrator
     			wakeupError = sleepDelay + (wakeupError / 3);				// feedforward zero
     			lastWakeup = thisWakeup;									// save most recent wakeup
 
             	try { Thread.sleep(wakeupError / 1000000L); }	// sleep 1 second
-            	catch (InterruptedException ex) { return; }
+            	catch (InterruptedException ex) { continue; }
             }
-    		
-    		HIITRun.this.uiHandler.obtainMessage(4).sendToTarget();
     	}
     };
     
+    // UI handler for messages from the Runner thread
+    private class HIITUIHandler extends Handler {
+    	public HIITUIHandler (Looper l) { super(l); }
+
+    	@Override
+    	public void handleMessage (Message m) {
+    		// if the message type is different than last time, update the view to the new one
+    		switch (m.what) {
+
+    		case 0:
+    			// change UI to WORK
+    			HIITRun.this.setContentView(R.layout.activity_hiitrun);
+    			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
+    			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSeconds);
+    			HIITRun.this.nIntervals = (TextView) findViewById(R.id.nIntervals);
+    			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocks);
+    			// update values
+    			HIITRun.this.lLayout.setBackgroundColor(Color.GREEN);
+    			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.workSeconds));
+    			HIITRun.this.nIntervals.setText(String.format("%d",m.arg1));
+    			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
+    			break;
+
+    		case 1:
+    			// change UI to BREAK
+    			HIITRun.this.lLayout.setBackgroundColor(Color.YELLOW);
+    			HIITRun.this.nSeconds.setText(String.format("%d", HIITRun.this.breakSeconds));
+    			break;
+
+    		case 2:
+    			// change UI to REST
+    			HIITRun.this.setContentView(R.layout.activity_hiitrun_rest);
+    			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
+    			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSecondsRest);
+    			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocksRest);
+    			// update values
+    			HIITRun.this.lLayout.setBackgroundColor(Color.RED);
+    			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.restSeconds));
+    			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
+    			break;
+
+    		case 3:
+    			// update seconds only
+    			HIITRun.this.nSeconds.setText(String.format("%d",m.arg1));
+    			break;
+
+    		case 4:
+    			HIITRun.this.onBackPressed();
+    			break;
+    		}
+    	}
+    }
+
     // create the activity. In addition to standard activities
     // we create a soundpool and tell it to preload the sounds
 	@Override
@@ -203,63 +284,29 @@ public class HIITRun extends Activity {
         						  |PowerManager.ON_AFTER_RELEASE
         						  ,"org.jfet.batsHIIT.HIITRun.scrUnLock"
         						  );
-        scrUnLock.acquire();
 
         // create a handler for hiitRunner to send us UI updates
-        uiHandler = new Handler(Looper.getMainLooper()) {
-        	// handle the message from the hiitRunner thread
-        	@Override
-        	public void handleMessage (Message m) {
-        		// if the message type is different than last time, update the view to the new one
-        		switch (m.what) {
-        		
-        		case 0:
-        			// change UI to WORK
-        			HIITRun.this.setContentView(R.layout.activity_hiitrun);
-        			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
-        			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSeconds);
-        			HIITRun.this.nIntervals = (TextView) findViewById(R.id.nIntervals);
-        			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocks);
-        			// update values
-        			HIITRun.this.lLayout.setBackgroundColor(Color.GREEN);
-        			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.workSeconds));
-        			HIITRun.this.nIntervals.setText(String.format("%d",m.arg1));
-        			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
-        			break;
-        		
-        		case 1:
-        			// change UI to BREAK
-        			HIITRun.this.lLayout.setBackgroundColor(Color.YELLOW);
-        			HIITRun.this.nSeconds.setText(String.format("%d", HIITRun.this.breakSeconds));
-        			break;
-        			
-        		case 2:
-        			// change UI to REST
-        			HIITRun.this.setContentView(R.layout.activity_hiitrun_rest);
-        			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
-        			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSecondsRest);
-        			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocksRest);
-        			// update values
-        			HIITRun.this.lLayout.setBackgroundColor(Color.RED);
-        			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.restSeconds));
-        			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
-        			break;
-        		
-        		case 3:
-        			// update seconds only
-        			HIITRun.this.nSeconds.setText(String.format("%d",m.arg1));
-        			break;
-
-        		case 4:
-        			HIITRun.super.onBackPressed();
-        			break;
-        		}
-        	}
-        };
-
+        uiHandler = new HIITUIHandler(Looper.getMainLooper());
+        // immediately use the handler to set up the view
         uiHandler.obtainMessage(2,0,blockCount).sendToTarget();
+
         hiitRunner = new HIITRunner();
-        hiitRunner.start();
+		// when we create this activity, also start the Runner thread
+		// never call start() twice on the same thread!
+		hiitRunner.start();
+	}
+	
+	// onResume is what happens *just* before we start running the thread
+	@Override
+	protected void onResume() { 
+		super.onResume();
+		// just before we start executing, make sure the screen never goes to sleep
+		scrUnLock.acquire();
+		
+		// tell the Runner thread to continue
+		// no harm if it's already running and we do this
+		hiitRunner.resumeRunner();
+		synchronized (this) { notify(); }	// break it out of its wait();
 	}
 	
 	// onPause is always called when the activity is undisplayed
@@ -267,10 +314,22 @@ public class HIITRun extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		hiitRunner.stopRunner();
-		hiitRunner.interrupt();
+		hiitRunner.pauseRunner();	// tell it to pause
+		hiitRunner.interrupt();		// cancel the current timeout, if any
+		// if there isn't a timeout, the exception will be raised without harm inside hangThread()
+
+		// just after we stop executing, release the screen lock
 		scrUnLock.release();
-		super.onBackPressed();
+	}
+	
+	@Override protected void onDestroy() {
+		super.onDestroy();
+
+		// if we're here, that means we've already paused the Runner thread
+		// thus, we set the flag for it to die and then pull it out of wait() so it returns
+		hiitRunner.resumeRunner();	// should not be necessary, but make sure it does not hang again
+		hiitRunner.stopRunner();	// next time through any loop it will see this and kill itself
+		synchronized (this) { notify(); }	// wake it up from its wait() so that it kills itself
 	}
 	
     // Set up the {@link android.app.ActionBar}, if the API is available.
