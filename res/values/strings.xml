@@ -2,16 +2,35 @@
 <resources>
 
     <string name="app_name">Bats! HIIT</string>
+    <string name="action_help">Help</string>
+    <string name="action_help_ok">OK</string>
+    <string name="help_message">A Bats! HIIT workout is an alternating sequence of rest intervals and work blocks.\n
+\nA workout always starts and ends with rest intervals for warmup and cool-down.\n
+\nIn each work block, there are a number of work/break pairs equal to the number of intervals you have selected.\n
+\nFor example, set work=30, break=10, rest=60, 5 intervals per block, 2 blocks. This workout looks like this:\n
+\n
+1. Warmup (60 sec)\n
+2. 5 x (30 sec work / 10 sec break)\n
+3. Rest (60 sec)\n
+4. 5 x (30 sec work / 10 sec break)\n
+5. Cooldown (60 sec)\n
+    </string>
     <string name="title_activity_hiitrun">HIIT!</string>
     <string name="go_string">Go!</string>
     <string name="zero_string">0</string>
     <string name="intv_string">intervals remaining</string>
     <string name="block_string">blocks remaining</string>
 	<string name="rest_string">Rest!</string>
+	<string name="done_string">Done!</string>
+	<string name="share_workout">Share your workout!</string>
+	<string name="share_subject">Just finished a HIIT workout!</string>
+	<string name="share_contents1">I just finished a</string>
+	<string name="share_contents2">HIIT workout with Bats! HIIT Interval Timer for Android | http://goo.gl/X9RAkU</string>
+	<string name="fb_broken">Note: Facebook does not allow me to pre-fill your wall post with your workout info; you\'ll have to write a personalized message before posting. Or just use Twitter instead!</string>
 	<string name="second_string">seconds remaining</string>
-	<string name="work_time">Work [s]</string>
-	<string name="break_time">Break [s]</string>
-	<string name="rest_time">Rest [s]</string>
+	<string name="work_time">Work (seconds)</string>
+	<string name="break_time">Break (seconds)</string>
+	<string name="rest_time">Rest (seconds)</string>
 	<string name="num_intv">Intervals per block</string>
 	<string name="num_block">Blocks</string>
 	<string name="work_dflt">50</string>

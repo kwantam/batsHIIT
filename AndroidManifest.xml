@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.jfet.batsHIIT"
-    android:versionCode="2"
-    android:versionName="1.08" >
+    android:versionCode="3"
+    android:versionName="1.0806" >
+    <!-- why yes, my version name *is* an increasing
+         substring of 2*cos(1). Thanks for noticing!
+      -->
 
     <uses-sdk
         android:minSdkVersion="8"

@@ -210,43 +210,52 @@ public class HIITRun extends Activity {
 
     		case 0:
     			// change UI to WORK
-    			HIITRun.this.setContentView(R.layout.activity_hiitrun);
-    			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
-    			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSeconds);
-    			HIITRun.this.nIntervals = (TextView) findViewById(R.id.nIntervals);
-    			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocks);
+    			setContentView(R.layout.activity_hiitrun);
+    			lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
+    			nSeconds = (TextView) findViewById(R.id.nSeconds);
+    			nIntervals = (TextView) findViewById(R.id.nIntervals);
+    			nBlocks = (TextView) findViewById(R.id.nBlocks);
     			// update values
-    			HIITRun.this.lLayout.setBackgroundColor(Color.GREEN);
-    			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.workSeconds));
-    			HIITRun.this.nIntervals.setText(String.format("%d",m.arg1));
-    			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
+    			lLayout.setBackgroundColor(Color.GREEN);
+    			nSeconds.setText(String.format("%d",workSeconds));
+    			nIntervals.setText(String.format("%d",m.arg1));
+    			nBlocks.setText(String.format("%d",m.arg2));
     			break;
 
     		case 1:
     			// change UI to BREAK
-    			HIITRun.this.lLayout.setBackgroundColor(Color.YELLOW);
-    			HIITRun.this.nSeconds.setText(String.format("%d", HIITRun.this.breakSeconds));
+    			lLayout.setBackgroundColor(Color.YELLOW);
+    			nSeconds.setText(String.format("%d", breakSeconds));
     			break;
 
     		case 2:
     			// change UI to REST
-    			HIITRun.this.setContentView(R.layout.activity_hiitrun_rest);
-    			HIITRun.this.lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
-    			HIITRun.this.nSeconds = (TextView) findViewById(R.id.nSecondsRest);
-    			HIITRun.this.nBlocks = (TextView) findViewById(R.id.nBlocksRest);
+    			setContentView(R.layout.activity_hiitrun_rest);
+    			lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
+    			nSeconds = (TextView) findViewById(R.id.nSecondsRest);
+    			nBlocks = (TextView) findViewById(R.id.nBlocksRest);
     			// update values
-    			HIITRun.this.lLayout.setBackgroundColor(Color.RED);
-    			HIITRun.this.nSeconds.setText(String.format("%d",HIITRun.this.restSeconds));
-    			HIITRun.this.nBlocks.setText(String.format("%d",m.arg2));
+    			lLayout.setBackgroundColor(Color.RED);
+    			nSeconds.setText(String.format("%d",restSeconds));
+    			nBlocks.setText(String.format("%d",m.arg2));
     			break;
 
     		case 3:
     			// update seconds only
-    			HIITRun.this.nSeconds.setText(String.format("%d",m.arg1));
+    			nSeconds.setText(String.format("%d",m.arg1));
     			break;
 
     		case 4:
-    			HIITRun.this.onBackPressed();
+    			// change UI to done
+    			setContentView(R.layout.activity_hiitrun_done);
+    			lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutDone);
+    			nSeconds = (TextView) findViewById(R.id.hiit_time_done);
+    			// update values
+    			int workoutTime = (1 + blockCount) * restSeconds + blockCount * intervalCount * (workSeconds + breakSeconds);
+    			lLayout.setBackgroundColor(Color.CYAN);
+    			nSeconds.setText(String.format("%d:%02d",workoutTime/60,workoutTime%60));
+    			// release screen lock, if held; we don't need this any more
+    			if (scrUnLock.isHeld()) scrUnLock.release();
     			break;
     		}
     	}
@@ -301,7 +310,7 @@ public class HIITRun extends Activity {
 	protected void onResume() { 
 		super.onResume();
 		// just before we start executing, make sure the screen never goes to sleep
-		scrUnLock.acquire();
+		if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
 		
 		// tell the Runner thread to continue
 		// no harm if it's already running and we do this
@@ -319,7 +328,7 @@ public class HIITRun extends Activity {
 		// if there isn't a timeout, the exception will be raised without harm inside hangThread()
 
 		// just after we stop executing, release the screen lock
-		scrUnLock.release();
+		if (scrUnLock.isHeld()) scrUnLock.release();
 	}
 	
 	@Override protected void onDestroy() {
@@ -349,6 +358,18 @@ public class HIITRun extends Activity {
                     return true;
             }
             return super.onOptionsItemSelected(item);
+    }
+    
+    public void shareHIIT (View v) {
+    	final Intent itt = new Intent(android.content.Intent.ACTION_SEND);
+    	itt.setType("text/plain");
+    	itt.putExtra(Intent.EXTRA_SUBJECT,R.string.share_subject);
+    	itt.putExtra(Intent.EXTRA_TEXT,String.format(
+    			"%s %s %s",
+    			getString(R.string.share_contents1),
+    			nSeconds.getText().toString(),
+    			getString(R.string.share_contents2)));
+    	startActivity(Intent.createChooser(itt,getString(R.string.share_workout)));
     }
 
     public void playBeep1 (View view) { sndMan.playSound(beep1); }

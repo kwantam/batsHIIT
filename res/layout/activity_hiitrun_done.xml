@@ -3,43 +3,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:id="@+id/hiitRunLayoutRest"
+    android:id="@+id/hiitRunLayoutDone"
     >
 <TextView 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/rest_string"
+    android:text="@string/done_string"
     android:gravity="center"
     android:textSize="80sp"
-    />
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
-    android:text="@string/zero_string"
-    android:gravity="center"
-    android:textSize="80sp"
-    android:id="@+id/nSecondsRest"
     />
 <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/second_string"
+    android:text="@string/hiit_time_str"
     android:gravity="center"
-    android:textSize="24sp"
+    android:textSize="36sp"
     />
 <TextView
-    android:id="@+id/nBlocksRest"
+    android:id="@+id/hiit_time_done"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="@string/zero_string"
     android:gravity="center"
     android:textSize="80sp"    
     />
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+	<View style="@style/SpacerW1" />
+<Button
+    android:layout_width="0dp"
+    android:layout_weight="3"
+    android:layout_height="wrap_content"
+    android:text="@string/share_workout"
+    android:onClick="shareHIIT"
+    android:background="@drawable/btn_blue"
+    style="@style/FolkertButtonText"
+    />
+	<View style="@style/SpacerW1" />
+</LinearLayout>
 <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/block_string"
+    android:text="@string/fb_broken"
     android:gravity="center"
-    android:textSize="24sp"
-    />
+    android:textSize="14sp" />
 </LinearLayout>

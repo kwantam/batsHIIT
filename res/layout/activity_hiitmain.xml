@@ -9,15 +9,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
+    <View style="@style/SpacerW5" />
     <EditText android:id="@+id/edit_work"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:inputType="number"
+        android:gravity="right"
         android:text="@string/work_dflt" />
+    <View style="@style/SpacerW1" />
     <TextView
         android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_weight="10"
         android:layout_height="wrap_content"
         android:text="@string/work_time"
         android:textSize="18sp"
@@ -27,15 +30,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
+    <View style="@style/SpacerW5" />
     <EditText android:id="@+id/edit_break"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:inputType="number"
+        android:gravity="right"
         android:text="@string/break_dflt" />
+    <View style="@style/SpacerW1" />
     <TextView
         android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_weight="10"
         android:layout_height="wrap_content"
         android:text="@string/break_time"
         android:textSize="18sp"
@@ -45,15 +51,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
+    <View style="@style/SpacerW5" />
     <EditText android:id="@+id/edit_rest"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:inputType="number"
+        android:gravity="right"
         android:text="@string/rest_dflt" />
+    <View style="@style/SpacerW1" />
     <TextView
         android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_weight="10"
         android:layout_height="wrap_content"
         android:text="@string/rest_time"
         android:textSize="18sp"
@@ -63,15 +72,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
+    <View style="@style/SpacerW5" />
     <EditText android:id="@+id/edit_intv"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:inputType="number"
+        android:gravity="right"
         android:text="@string/intv_dflt" />
+    <View style="@style/SpacerW1" />
     <TextView
         android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_weight="10"
         android:layout_height="wrap_content"
         android:text="@string/num_intv"
         android:textSize="18sp"
@@ -81,15 +93,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
+    <View style="@style/SpacerW5" />
     <EditText android:id="@+id/edit_block"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:inputType="number"
+        android:gravity="right"
         android:text="@string/block_dflt" />
+    <View style="@style/SpacerW1" />
     <TextView
         android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_weight="10"
         android:layout_height="wrap_content"
         android:text="@string/num_block"
         android:textSize="18sp"
@@ -148,15 +163,15 @@
         android:onClick="hiitRun"
         android:text="@string/go_string"
         android:textSize="48sp"
+        android:background="@drawable/btn_green"
+        style="@style/FolkertButtonText"
         />
     <View style="@style/SpacerW1" />
 </LinearLayout>
 
 <View style="@style/Spacer" />
 <View style="@style/Spacer" />
-<View style="@style/Spacer" />
 <View style="@style/Divider" />
-<View style="@style/Spacer" />
 <View style="@style/Spacer" />
 <View style="@style/Spacer" />
 
@@ -170,16 +185,27 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:hint="@string/saveAs_string" />
-    <Button
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:onClick="saveButton"
-        android:text="@string/save_string"
-        android:textSize="18sp"
-        />
+        android:orientation="vertical" >
+        <Button
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:onClick="saveButton"
+        	android:text="@string/save_string"
+        	android:textSize="18sp"
+        	android:background="@drawable/btn_blue"
+        	style="@style/FolkertButtonText"
+        	/>
+        </LinearLayout>
 </LinearLayout>
 
+<View style="@style/Spacer" />
+<View style="@style/Spacer" />
+<View style="@style/Divider" />
+<View style="@style/Spacer" />
 <View style="@style/Spacer" />
 
 <LinearLayout
@@ -192,32 +218,31 @@
         android:layout_weight="3"
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown" />
-    <Button
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:onClick="loadButton"
-        android:text="@string/load_string"
-        android:textSize="18sp"
-        />
+        android:orientation="vertical" >
+    	<Button
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:onClick="loadButton"
+        	android:text="@string/load_string"
+        	android:textSize="18sp"
+        	android:background="@drawable/btn_blue"
+        	style="@style/FolkertButtonText"
+			/>
+		<View style="@style/Spacer" />
+    	<Button
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:onClick="delButton"
+        	android:text="@string/del_string"
+        	android:textSize="18sp"
+        	android:background="@drawable/btn_yellow"
+        	style="@style/FolkertButtonText"
+        	/>
+	</LinearLayout>
 </LinearLayout>
 
-<View style="@style/Spacer" />
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal" >
-	<View style="@style/SpacerW1" />
-	<View style="@style/SpacerW1" />
-	<View style="@style/SpacerW1" />
-    <Button
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:onClick="delButton"
-        android:text="@string/del_string"
-        android:textSize="18sp"
-        />
-</LinearLayout>
 </LinearLayout>

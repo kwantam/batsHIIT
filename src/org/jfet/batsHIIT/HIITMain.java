@@ -4,13 +4,17 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -161,6 +165,7 @@ public class HIITMain extends Activity {
     	startActivity(intent);
     }
     
+    // saving settings
     private String canonicalizeSettingsName(final String sName) {
     	return ("org.jfet.batsHIIT." + sName);
     }
@@ -240,4 +245,34 @@ public class HIITMain extends Activity {
     	pEdit.commit();
     	populateLoadSpinner();
 	}
+
+	// menu stuff
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.hiitmain, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected (MenuItem mi) {
+    	super.onOptionsItemSelected(mi);	// call this first; it will fall through to us
+    	showHelpDialog();
+    	return true;
+    }
+	
+    private void showHelpDialog() {
+    	final AlertDialog.Builder dlg = new AlertDialog.Builder(this);
+    	final DialogInterface.OnClickListener ocl = new DialogInterface.OnClickListener() {
+    		@Override
+    		public void onClick(DialogInterface dlg, int w) {
+    			return;
+    		}
+    	};
+    	dlg.setTitle(R.string.action_help);
+    	dlg.setMessage(R.string.help_message);
+    	dlg.setPositiveButton(R.string.action_help_ok,ocl);
+    	dlg.show();
+    	return;
+    }
 }
