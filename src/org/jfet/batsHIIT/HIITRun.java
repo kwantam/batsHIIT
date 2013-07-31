@@ -1,5 +1,6 @@
 package org.jfet.batsHIIT;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -12,9 +13,12 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 public class HIITRun extends Activity {
@@ -39,6 +43,7 @@ public class HIITRun extends Activity {
     private int intervalCount;
     private int blockCount;
     private WakeLock scrUnLock;
+    private boolean hiitDone = false;
     
     private static enum HIITState { WORK, BREAK, REST };
     
@@ -200,8 +205,12 @@ public class HIITRun extends Activity {
     };
     
     // UI handler for messages from the Runner thread
+    // note: we're OK to suppress the HandlerLeak because we never send delayed messages
+    // the leak will only happen until the last message is delivered, which in our case
+    // should be more or less instantaneously
+    @SuppressLint("HandlerLeak")
     private class HIITUIHandler extends Handler {
-    	public HIITUIHandler (Looper l) { super(l); }
+		public HIITUIHandler (Looper l) { super(l); }
 
     	@Override
     	public void handleMessage (Message m) {
@@ -250,6 +259,11 @@ public class HIITRun extends Activity {
     			setContentView(R.layout.activity_hiitrun_done);
     			lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutDone);
     			nSeconds = (TextView) findViewById(R.id.hiit_time_done);
+    			hiitDone = true;
+    			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+    				invalidateOptionsMenu();
+    				((Button) findViewById(R.id.share_button)).setVisibility(View.INVISIBLE);
+    			}
     			// update values
     			int workoutTime = (1 + blockCount) * restSeconds + blockCount * intervalCount * (workSeconds + breakSeconds);
     			lLayout.setBackgroundColor(Color.CYAN);
@@ -263,6 +277,8 @@ public class HIITRun extends Activity {
 
     // create the activity. In addition to standard activities
     // we create a soundpool and tell it to preload the sounds
+    // don't warn about SCREEN_DIM_WAKE_LOCK, I know it's deprecated but it's preferable to keeping the screen at full brightness
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -304,7 +320,26 @@ public class HIITRun extends Activity {
 		// never call start() twice on the same thread!
 		hiitRunner.start();
 	}
-	
+    
+	// menu stuff
+	// suppress NewApi because we check before calling
+	// since API 8, you can check before calling because class loading is intentionally made less aggressive
+    @SuppressLint("NewApi")
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	if (hiitDone && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
+    		// only show the menu after we're done
+    		getMenuInflater().inflate(R.menu.hiitrun, menu);
+    		// get the share menu set up
+    		final MenuItem mItem = (MenuItem) menu.findItem(R.id.share_menu);
+    		final ShareActionProvider sActPro = (ShareActionProvider) mItem.getActionProvider();
+    		sActPro.setShareIntent(getHIITIntent());
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+    
 	// onResume is what happens *just* before we start running the thread
 	@Override
 	protected void onResume() { 
@@ -360,7 +395,9 @@ public class HIITRun extends Activity {
             return super.onOptionsItemSelected(item);
     }
     
-    public void shareHIIT (View v) {
+    // create an intent for sharing our workout
+    // passed to the ShareActionProvider
+    private Intent getHIITIntent () {
     	final Intent itt = new Intent(android.content.Intent.ACTION_SEND);
     	itt.setType("text/plain");
     	itt.putExtra(Intent.EXTRA_SUBJECT,R.string.share_subject);
@@ -369,11 +406,10 @@ public class HIITRun extends Activity {
     			getString(R.string.share_contents1),
     			nSeconds.getText().toString(),
     			getString(R.string.share_contents2)));
-    	startActivity(Intent.createChooser(itt,getString(R.string.share_workout)));
+    	return itt;
     }
-
-    public void playBeep1 (View view) { sndMan.playSound(beep1); }
-    public void playBeep2 (View view) { sndMan.playSound(beep2); }
-    public void playChirp (View view) { sndMan.playSound(chirp); }
-
+    
+    public void shareHIIT (View v) {
+    	startActivity(Intent.createChooser(getHIITIntent(),getString(R.string.share_workout)));
+    }
 }

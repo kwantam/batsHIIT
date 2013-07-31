@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/share_menu"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/share_workout"
+		android:actionProviderClass="android.widget.ShareActionProvider" 
+		/>
+
+</menu>

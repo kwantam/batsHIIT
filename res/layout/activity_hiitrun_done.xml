@@ -33,6 +33,7 @@
     android:layout_height="wrap_content" >
 	<View style="@style/SpacerW1" />
 <Button
+    android:id="@+id/share_button"
     android:layout_width="0dp"
     android:layout_weight="3"
     android:layout_height="wrap_content"
