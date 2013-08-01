@@ -5,6 +5,22 @@
     android:gravity="center"
     android:id="@+id/hiitRunLayoutDone"
     >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:textSize="36sp"
+        android:text="@string/share_workout"
+        />
+        <!-- android:drawableRight="@android:drawable/arrow_up_float" -->
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="10"
+    android:gravity="center"
+    >
 <TextView 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,27 +43,24 @@
     android:gravity="center"
     android:textSize="80sp"    
     />
+	<View style="@style/Spacer" />
+	<View style="@style/Spacer" />
+	<View style="@style/Spacer" />
+	<View style="@style/Spacer" />
+	<View style="@style/Spacer" />
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 	<View style="@style/SpacerW1" />
-<Button
-    android:id="@+id/share_button"
-    android:layout_width="0dp"
-    android:layout_weight="3"
-    android:layout_height="wrap_content"
-    android:text="@string/share_workout"
-    android:onClick="shareHIIT"
-    android:background="@drawable/btn_blue"
-    style="@style/FolkertButtonText"
-    />
-	<View style="@style/SpacerW1" />
-</LinearLayout>
 <TextView
-    android:layout_width="match_parent"
+    android:layout_width="0dp"
+    android:layout_weight="6"
     android:layout_height="wrap_content"
     android:text="@string/fb_broken"
     android:gravity="center"
     android:textSize="14sp" />
+	<View style="@style/SpacerW1" />
+</LinearLayout>
+</LinearLayout>
 </LinearLayout>

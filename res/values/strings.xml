@@ -22,7 +22,7 @@
     <string name="block_string">blocks remaining</string>
 	<string name="rest_string">Rest!</string>
 	<string name="done_string">Done!</string>
-	<string name="share_workout">Share your workout!</string>
+	<string name="share_workout">Share your workout! &#8593;&#160;&#160;</string>
 	<string name="share_subject">Just finished a HIIT workout!</string>
 	<string name="share_contents1">I just finished a</string>
 	<string name="share_contents2">HIIT workout with Bats! HIIT Interval Timer for Android | http://goo.gl/X9RAkU</string>
