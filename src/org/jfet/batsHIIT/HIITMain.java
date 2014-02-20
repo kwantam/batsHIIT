@@ -213,6 +213,7 @@ public class HIITMain extends Activity {
         eRest.setText(setScan.next());
         eIntv.setText(setScan.next());
         eBlock.setText(setScan.next());
+        setScan.close();
         recomputeHIITTime();
         setupListener(true);
     }
