@@ -2,6 +2,11 @@
 
 Bats! HIIT is a simple but useful High Intensity Interval Training timer for Android.
 
+<a href="https://f-droid.org/packages/org.jfet.batsHIIT/" target="_blank">
+<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="90"/></a>
+<a href="https://play.google.com/store/apps/details?id=org.jfet.batsHIIT" target="_blank">
+<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="90"/></a>
+
 ## How to use Bats! HIIT
 
 ### Workout structure
