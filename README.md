@@ -49,6 +49,12 @@ If Bats! HIIT loses focus during a workout, your workout will be paused and will
 
 To ensure that your workout is accurately timed, Bats! HIIT implements a feedback system called a [delay-locked loop](http://en.wikipedia.org/wiki/Delay-locked_loop). Every second, when Bats! HIIT wakes up to update the timer readout, it measures how long it was actually asleep and adjusts future delay intervals to hit the target 1-second sleep interval. In practice, this reduces short-term timing errors from more than 5% to about 0.2%; since the error is integrated over the life of your workout, the overall accuracy is two to three orders of magnitude better than the short-term errors.
 
+## Artwork
+
+Screenshots have been made with the help of Android's [device art generator](https://developer.android.com/distribute/marketing-tools/device-art-generator).
+
+For adding images to app stores, see [All About Descriptions, Graphics, and Screenshots](https://f-droid.org/en/docs/All_About_Descriptions_Graphics_and_Screenshots/).
+
 ## License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
