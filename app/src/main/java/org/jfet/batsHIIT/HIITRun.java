@@ -11,14 +11,14 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class HIITRun extends ActionBarActivity {
+public class HIITRun extends AppCompatActivity {
     // sound manager
     private SoundManager sndMan;
     // resource reference and SoundManager IDs for the sounds we'll use
