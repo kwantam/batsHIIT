@@ -44,6 +44,8 @@
 	<string name="saveAs_string">Save As&#8230;</string>
 	<string name="lastWorkout">Last workout</string>
 	<string name="hiit_time_str">Workout time:</string>
-	<!-- <string name="keep_awake">Keep screen on</string> -->
+    <string name="pause">Pause</string>
+	<string name="resume">Resume</string>
+    <!-- <string name="keep_awake">Keep screen on</string> -->
     
 </resources>

@@ -49,5 +49,18 @@
     android:text="@string/block_string"
     android:gravity="center"
     android:textSize="24sp"
-    />    
+    />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="71dp" />
+
+    <Button
+        android:id="@+id/pause_button"
+        style="@style/FolkertButtonText"
+        android:layout_width="300dp"
+        android:layout_height="92dp"
+        android:background="@drawable/btn_yellow"
+        android:text="@string/pause" />
+
 </LinearLayout>

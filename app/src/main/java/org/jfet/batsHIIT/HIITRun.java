@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,6 +42,7 @@ public class HIITRun extends AppCompatActivity {
     private int intervalCount;
     private int blockCount;
     private WakeLock scrUnLock;
+    private Button btnPause;
     private boolean hiitDone = false;
     
     private static enum HIITState { WORK, BREAK, REST };
@@ -57,6 +60,8 @@ public class HIITRun extends AppCompatActivity {
         public void pauseRunner() {
             runLoop = false;
         }
+
+        public boolean isPaused() { return runLoop; }
         
         public void resumeRunner() {
             runLoop = true;
@@ -208,6 +213,16 @@ public class HIITRun extends AppCompatActivity {
     @SuppressLint("HandlerLeak")
     private class HIITUIHandler extends Handler {
         public HIITUIHandler (Looper l) { super(l); }
+        private void setupPauseButton() {
+            btnPause = (Button) findViewById(R.id.pause_button); //FIND THE BUTTON
+            if (btnPause == null) btnPause = (Button) findViewById(R.id.pause_button2); //FIND THE BUTTON
+            btnPause.setOnClickListener(new View.OnClickListener() { //SET ON CLICK LISTENER
+                @Override
+                public void onClick(View v) {
+                    doPause();
+                }
+            });
+        }
 
         @Override
         public void handleMessage (Message m) {
@@ -217,6 +232,7 @@ public class HIITRun extends AppCompatActivity {
             case 0:
                 // change UI to WORK
                 setContentView(R.layout.activity_hiitrun);
+                setupPauseButton();
                 lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
                 nSeconds = (TextView) findViewById(R.id.nSeconds);
                 nIntervals = (TextView) findViewById(R.id.nIntervals);
@@ -237,6 +253,7 @@ public class HIITRun extends AppCompatActivity {
             case 2:
                 // change UI to REST
                 setContentView(R.layout.activity_hiitrun_rest);
+                setupPauseButton();
                 lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
                 nSeconds = (TextView) findViewById(R.id.nSecondsRest);
                 nBlocks = (TextView) findViewById(R.id.nBlocksRest);
@@ -330,20 +347,20 @@ public class HIITRun extends AppCompatActivity {
             return false;
         }
     }
-    
+    /*
     // onResume is what happens *just* before we start running the thread
     @Override
-    protected void onResume() { 
+    protected void onResume() {
         super.onResume();
         // just before we start executing, make sure the screen never goes to sleep
         if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
-        
+
         // tell the Runner thread to continue
         // no harm if it's already running and we do this
         hiitRunner.resumeRunner();
         synchronized (this) { notify(); }    // break it out of its wait();
     }
-    
+
     // onPause is always called when the activity is undisplayed
     // stop the counter thread here
     @Override
@@ -355,8 +372,29 @@ public class HIITRun extends AppCompatActivity {
 
         // just after we stop executing, release the screen lock
         if (scrUnLock.isHeld()) scrUnLock.release();
+    } */
+
+    protected void doPause() {
+        if (hiitRunner.isPaused()) {
+            hiitRunner.pauseRunner();    // tell it to pause
+            hiitRunner.interrupt();        // cancel the current timeout, if any
+            // if there isn't a timeout, the exception will be raised without harm inside hangThread()
+
+            // just after we stop executing, release the screen lock
+            if (scrUnLock.isHeld()) scrUnLock.release();
+            btnPause.setText(R.string.resume);
+        } else {
+            // just before we start executing, make sure the screen never goes to sleep
+            if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
+
+            // tell the Runner thread to continue
+            // no harm if it's already running and we do this
+            hiitRunner.resumeRunner();
+            synchronized (this) { notify(); }    // break it out of its wait();
+            btnPause.setText(R.string.pause);
+        }
     }
-    
+
     @Override protected void onDestroy() {
         super.onDestroy();
 
