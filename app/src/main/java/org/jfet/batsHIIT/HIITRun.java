@@ -13,6 +13,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -213,16 +214,6 @@ public class HIITRun extends AppCompatActivity {
     @SuppressLint("HandlerLeak")
     private class HIITUIHandler extends Handler {
         public HIITUIHandler (Looper l) { super(l); }
-        private void setupPauseButton() {
-            btnPause = (Button) findViewById(R.id.pause_button); //FIND THE BUTTON
-            if (btnPause == null) btnPause = (Button) findViewById(R.id.pause_button2); //FIND THE BUTTON
-            btnPause.setOnClickListener(new View.OnClickListener() { //SET ON CLICK LISTENER
-                @Override
-                public void onClick(View v) {
-                    doPause();
-                }
-            });
-        }
 
         @Override
         public void handleMessage (Message m) {
@@ -230,14 +221,8 @@ public class HIITRun extends AppCompatActivity {
             switch (m.what) {
 
             case 0:
-                // change UI to WORK
-                setContentView(R.layout.activity_hiitrun);
-                setupPauseButton();
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
-                nSeconds = (TextView) findViewById(R.id.nSeconds);
-                nIntervals = (TextView) findViewById(R.id.nIntervals);
-                nBlocks = (TextView) findViewById(R.id.nBlocks);
                 // update values
+                findViewById(R.id.intervals_remaining).setVisibility(View.VISIBLE);
                 lLayout.setBackgroundColor(Color.GREEN);
                 nSeconds.setText(String.format("%d",workSeconds));
                 nIntervals.setText(String.format("%d",m.arg1));
@@ -252,15 +237,12 @@ public class HIITRun extends AppCompatActivity {
 
             case 2:
                 // change UI to REST
-                setContentView(R.layout.activity_hiitrun_rest);
-                setupPauseButton();
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
-                nSeconds = (TextView) findViewById(R.id.nSecondsRest);
-                nBlocks = (TextView) findViewById(R.id.nBlocksRest);
                 // update values
                 lLayout.setBackgroundColor(Color.RED);
                 nSeconds.setText(String.format("%d",restSeconds));
                 nBlocks.setText(String.format("%d",m.arg2));
+                nIntervals.setText(R.string.rest_string);
+                findViewById(R.id.intervals_remaining).setVisibility(View.INVISIBLE);
                 break;
 
             case 3:
@@ -269,18 +251,11 @@ public class HIITRun extends AppCompatActivity {
                 break;
 
             case 4:
-                // change UI to done
-                setContentView(R.layout.activity_hiitrun_done);
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutDone);
-                nSeconds = (TextView) findViewById(R.id.hiit_time_done);
-                hiitDone = true;
-                supportInvalidateOptionsMenu();
-                // update values
                 int workoutTime = (1 + blockCount) * restSeconds + blockCount * intervalCount * (workSeconds + breakSeconds);
-                lLayout.setBackgroundColor(Color.CYAN);
-                nSeconds.setText(String.format("%d:%02d",workoutTime/60,workoutTime%60));
-                // release screen lock, if held; we don't need this any more
-                if (scrUnLock.isHeld()) scrUnLock.release();
+                Intent intent = new Intent(HIITRun.this, HIITRunDone.class);
+                intent.putExtra("RESULT",String.format("%d:%02d",workoutTime/60,workoutTime%60));
+                finish();
+                startActivity(intent);
                 break;
             }
         }
@@ -293,10 +268,25 @@ public class HIITRun extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
+        // change UI to WORK
+        setContentView(R.layout.activity_hiitrun);
+        setSupportActionBar((Toolbar) findViewById(R.id.run_toolbar));
         // setup the action bar with a back button (compat version)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
+        //setupPauseButton();
+        lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
+        nSeconds = (TextView) findViewById(R.id.nSeconds);
+        nIntervals = (TextView) findViewById(R.id.nIntervals);
+        nBlocks = (TextView) findViewById(R.id.nBlocks);
+        btnPause = (Button) findViewById(R.id.pause_button); //FIND THE BUTTON
+        btnPause.setOnClickListener(new View.OnClickListener() { //SET ON CLICK LISTENER
+            @Override
+            public void onClick(View v) {
+                doPause();
+            }
+        });
+
         // create the sound manager instance
         sndMan = new SoundManager(this);
         // load the sounds to initialize the sound manager
@@ -335,17 +325,7 @@ public class HIITRun extends AppCompatActivity {
     // menu stuff
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (hiitDone) {
-            // inflate the premade menu
-            getMenuInflater().inflate(R.menu.hiitrun, menu);
-            // now connect the ShareActionProvider with our sharing intent
-            final MenuItem mItem = (MenuItem) menu.findItem(R.id.share_menu);
-            final ShareActionProvider sActPro = (ShareActionProvider) MenuItemCompat.getActionProvider(mItem);
-            sActPro.setShareIntent(getHIITIntent());
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
     /*
     // onResume is what happens *just* before we start running the thread
@@ -414,19 +394,5 @@ public class HIITRun extends AppCompatActivity {
                     return true;
             }
             return super.onOptionsItemSelected(item);
-    }
-    
-    // create an intent for sharing our workout
-    // passed to the ShareActionProvider
-    private Intent getHIITIntent () {
-        final Intent itt = new Intent(android.content.Intent.ACTION_SEND);
-        itt.setType("text/plain");
-        itt.putExtra(Intent.EXTRA_SUBJECT,R.string.share_subject);
-        itt.putExtra(Intent.EXTRA_TEXT,String.format(
-                "%s %s %s",
-                getString(R.string.share_contents1),
-                nSeconds.getText().toString(),
-                getString(R.string.share_contents2)));
-        return itt;
     }
 }

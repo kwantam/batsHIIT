@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -21,7 +23,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class HIITMain extends Activity {
+public class HIITMain extends AppCompatActivity {
     // keys for the intent we send to Run
     public static final String M_WORK = "org.jfet.batsHIIT.M_WORK";
     public static final String M_BREAK = "org.jfet.batsHIIT.M_BREAK";
@@ -63,6 +65,7 @@ public class HIITMain extends Activity {
 
         // set up the view, populate the elements
         setContentView(R.layout.activity_hiitmain);
+        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
         eWork = (EditText) findViewById(R.id.edit_work);
         eBreak = (EditText) findViewById(R.id.edit_break);
         eRest = (EditText) findViewById(R.id.edit_rest);

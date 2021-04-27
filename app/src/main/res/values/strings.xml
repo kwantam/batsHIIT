@@ -46,6 +46,7 @@
 	<string name="hiit_time_str">Workout time:</string>
     <string name="pause">Pause</string>
 	<string name="resume">Resume</string>
+    <string name="auto_pause">Auto-Pause</string>
     <!-- <string name="keep_awake">Keep screen on</string> -->
     
 </resources>

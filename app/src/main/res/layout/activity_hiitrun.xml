@@ -1,66 +1,87 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
     android:id="@+id/hiitRunLayout"
-    >
-<TextView
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
-    android:text="@string/zero_string"
+    android:layout_height="fill_parent"
     android:gravity="center"
-    android:textSize="80sp"
-    android:id="@+id/nSeconds"
-    />
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/second_string"
-    android:gravity="center"
-    android:textSize="24sp"
-    />
-<TextView 
-    android:id="@+id/nIntervals"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/zero_string"
-    android:gravity="center"
-    android:textSize="80sp"
-    />
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/intv_string"
-    android:gravity="center"
-    android:textSize="24sp"
-    />
-<TextView
-    android:id="@+id/nBlocks"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/zero_string"
-    android:gravity="center"
-    android:textSize="80sp"    
-    />
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/block_string"
-    android:gravity="center"
-    android:textSize="24sp"
-    />
+    android:orientation="vertical">
 
-    <Space
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/run_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="71dp" />
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
 
-    <Button
-        android:id="@+id/pause_button"
-        style="@style/FolkertButtonText"
-        android:layout_width="300dp"
-        android:layout_height="92dp"
-        android:background="@drawable/btn_yellow"
-        android:text="@string/pause" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nSeconds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/zero_string"
+            android:textSize="80sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/second_string"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/nIntervals"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/zero_string"
+            android:textSize="80sp" />
+
+        <TextView
+            android:id="@+id/intervals_remaining"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/intv_string"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/nBlocks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/zero_string"
+            android:textSize="80sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/block_string"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/pause_button"
+            style="@style/FolkertButtonText"
+            android:layout_width="300dp"
+            android:layout_height="92dp"
+            android:background="@drawable/btn_yellow"
+            android:text="@string/pause" />
+    </LinearLayout>
 
 </LinearLayout>
