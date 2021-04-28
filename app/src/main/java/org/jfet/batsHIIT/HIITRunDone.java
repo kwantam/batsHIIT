@@ -45,6 +45,7 @@ public class HIITRunDone extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.rundone_toolbar));
         // setup the action bar with a back button (compat version)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
         ((TextView) findViewById(R.id.hiit_time_done)).setText(getIntent().getStringExtra("RESULT"));
     }
 }

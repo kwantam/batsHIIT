@@ -69,6 +69,7 @@ public class HIITMain extends AppCompatActivity {
         // set up the view, populate the elements
         setContentView(R.layout.activity_hiitmain);
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
         eWork = (EditText) findViewById(R.id.edit_work);
         eBreak = (EditText) findViewById(R.id.edit_break);
         eRest = (EditText) findViewById(R.id.edit_rest);

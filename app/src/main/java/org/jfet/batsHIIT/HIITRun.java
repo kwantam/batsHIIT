@@ -274,6 +274,7 @@ public class HIITRun extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.run_toolbar));
         // setup the action bar with a back button (compat version)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
         //setupPauseButton();
         lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
         nSeconds = (TextView) findViewById(R.id.nSeconds);
