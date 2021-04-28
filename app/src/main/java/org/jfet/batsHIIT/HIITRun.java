@@ -62,7 +62,7 @@ public class HIITRun extends AppCompatActivity {
             runLoop = false;
         }
 
-        public boolean isPaused() { return runLoop; }
+        public boolean isPaused() { return !runLoop; }
         
         public void resumeRunner() {
             runLoop = true;
@@ -327,18 +327,12 @@ public class HIITRun extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
-    /*
+
     // onResume is what happens *just* before we start running the thread
     @Override
     protected void onResume() {
         super.onResume();
-        // just before we start executing, make sure the screen never goes to sleep
-        if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
-
-        // tell the Runner thread to continue
-        // no harm if it's already running and we do this
-        hiitRunner.resumeRunner();
-        synchronized (this) { notify(); }    // break it out of its wait();
+        if (hiitRunner.isPaused()) doPause();
     }
 
     // onPause is always called when the activity is undisplayed
@@ -346,16 +340,11 @@ public class HIITRun extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        hiitRunner.pauseRunner();    // tell it to pause
-        hiitRunner.interrupt();        // cancel the current timeout, if any
-        // if there isn't a timeout, the exception will be raised without harm inside hangThread()
-
-        // just after we stop executing, release the screen lock
-        if (scrUnLock.isHeld()) scrUnLock.release();
-    } */
+        if (!hiitRunner.isPaused()) doPause();
+    }
 
     protected void doPause() {
-        if (hiitRunner.isPaused()) {
+        if (!hiitRunner.isPaused()) {
             hiitRunner.pauseRunner();    // tell it to pause
             hiitRunner.interrupt();        // cancel the current timeout, if any
             // if there isn't a timeout, the exception will be raised without harm inside hangThread()

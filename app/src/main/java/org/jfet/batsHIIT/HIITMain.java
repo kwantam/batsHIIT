@@ -30,6 +30,8 @@ public class HIITMain extends AppCompatActivity {
     public static final String M_REST = "org.jfet.batsHIIT.M_REST";
     public static final String M_INTV = "org.jfet.batsHIIT.M_INTV";
     public static final String M_BLOCK = "org.jfet.batsHIIT.M_BLOCK";
+    public static final String M_AUTOPAUSE = "org.jfet.batsHIIT.M_AUTOPAUSE";
+    public static final String PREFS = "org.jfet.batsHIIT.PREFS";
     private EditText eWork;
     private EditText eBreak;
     private EditText eRest;
@@ -41,6 +43,7 @@ public class HIITMain extends AppCompatActivity {
     private int iRest;
     private int iIntv;
     private int iBlock;
+    private boolean autopause = false;
     
     private class HIITInputWatcher implements TextWatcher {
         // need a reference to the parent activity
@@ -162,6 +165,7 @@ public class HIITMain extends AppCompatActivity {
         intent.putExtra(M_REST,iRest);
         intent.putExtra(M_INTV,iIntv);
         intent.putExtra(M_BLOCK,iBlock);
+        intent.putExtra(M_AUTOPAUSE,autopause);
 
         // if we got here, these settings are reasonably sensible
         saveSettings(getString(R.string.lastWorkout));
@@ -255,13 +259,19 @@ public class HIITMain extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.hiitmain, menu);
+        menu.findItem(R.id.action_autopause).setChecked(getSharedPreferences(PREFS, 0).getBoolean(M_AUTOPAUSE, false));
         return true;
     }
     
     @Override
     public boolean onOptionsItemSelected (MenuItem mi) {
         super.onOptionsItemSelected(mi);    // call this first; it will fall through to us
-        showHelpDialog();
+        if (mi.getItemId() == R.id.action_help) {
+            showHelpDialog();
+        } else {
+            mi.setChecked(!mi.isChecked());
+            getSharedPreferences(PREFS, 0).edit().putBoolean(M_AUTOPAUSE, mi.isChecked()).commit();
+        }
         return true;
     }
     

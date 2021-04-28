@@ -7,9 +7,9 @@
         android:title="@string/action_help"
         app:showAsAction="never|collapseActionView" />
     <item
-        android:id="@+id/app_bar_switch"
+        android:id="@+id/action_autopause"
+        android:checkable="true"
         android:title="@string/auto_pause"
-        app:actionLayout="@layout/switch_item"
-        app:showAsAction="never|collapseActionView" />
-
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="never|withText" />
 </menu>
