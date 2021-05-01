@@ -43,7 +43,6 @@ public class HIITMain extends AppCompatActivity {
     private int iRest;
     private int iIntv;
     private int iBlock;
-    private boolean autopause = false;
     
     private class HIITInputWatcher implements TextWatcher {
         // need a reference to the parent activity
@@ -166,7 +165,7 @@ public class HIITMain extends AppCompatActivity {
         intent.putExtra(M_REST,iRest);
         intent.putExtra(M_INTV,iIntv);
         intent.putExtra(M_BLOCK,iBlock);
-        intent.putExtra(M_AUTOPAUSE,autopause);
+        intent.putExtra(M_AUTOPAUSE,getSharedPreferences(PREFS, 0).getBoolean(M_AUTOPAUSE, false));
 
         // if we got here, these settings are reasonably sensible
         saveSettings(getString(R.string.lastWorkout));

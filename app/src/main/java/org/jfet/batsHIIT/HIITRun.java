@@ -42,6 +42,7 @@ public class HIITRun extends AppCompatActivity {
     private int restSeconds;
     private int intervalCount;
     private int blockCount;
+    private boolean autopause;
     private WakeLock scrUnLock;
     private Button btnPause;
     private boolean hiitDone = false;
@@ -302,6 +303,7 @@ public class HIITRun extends AppCompatActivity {
         restSeconds = itt.getIntExtra(HIITMain.M_REST, Integer.parseInt(getString(R.string.rest_dflt)));
         intervalCount = itt.getIntExtra(HIITMain.M_INTV, Integer.parseInt(getString(R.string.intv_dflt)));
         blockCount = itt.getIntExtra(HIITMain.M_BLOCK, Integer.parseInt(getString(R.string.block_dflt)));
+        autopause = itt.getBooleanExtra(HIITMain.M_AUTOPAUSE, false);
 
         // make sure the screen stays on through the workout
         // this works, but always keeps the screen at 100% brightness
@@ -333,7 +335,7 @@ public class HIITRun extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (hiitRunner.isPaused()) doPause();
+        if (autopause && hiitRunner.isPaused()) doPause();
     }
 
     // onPause is always called when the activity is undisplayed
@@ -341,7 +343,7 @@ public class HIITRun extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (!hiitRunner.isPaused()) doPause();
+        if (autopause && !hiitRunner.isPaused()) doPause();
     }
 
     protected void doPause() {
