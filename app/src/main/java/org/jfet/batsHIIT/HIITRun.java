@@ -44,6 +44,7 @@ public class HIITRun extends AppCompatActivity {
     private int blockCount;
     private boolean autopause;
     private WakeLock scrUnLock;
+    private WakeLock cpuUnLock;
     private Button btnPause;
     private boolean hiitDone = false;
     
@@ -313,6 +314,12 @@ public class HIITRun extends AppCompatActivity {
                                   |PowerManager.ON_AFTER_RELEASE
                                   ,"org.jfet.batsHIIT.HIITRun.scrUnLock"
                                   );
+        scrUnLock.acquire();
+        if (!autopause) {
+            cpuUnLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                    ,"org.jfet.batsHIIT.HIITRun.cpuUnLock");
+            cpuUnLock.acquire();
+        }
 
         // create a handler for hiitRunner to send us UI updates
         uiHandler = new HIITUIHandler(Looper.getMainLooper());
@@ -375,6 +382,8 @@ public class HIITRun extends AppCompatActivity {
         hiitRunner.resumeRunner();    // should not be necessary, but make sure it does not hang again
         hiitRunner.stopRunner();    // next time through any loop it will see this and kill itself
         synchronized (this) { notify(); }    // wake it up from its wait() so that it kills itself
+        scrUnLock.release();
+        if (!autopause) cpuUnLock.release();
     }
     
     @Override
