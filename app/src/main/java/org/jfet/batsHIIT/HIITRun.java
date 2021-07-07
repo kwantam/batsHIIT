@@ -11,14 +11,17 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class HIITRun extends ActionBarActivity {
+public class HIITRun extends AppCompatActivity {
     // sound manager
     private SoundManager sndMan;
     // resource reference and SoundManager IDs for the sounds we'll use
@@ -39,7 +42,10 @@ public class HIITRun extends ActionBarActivity {
     private int restSeconds;
     private int intervalCount;
     private int blockCount;
+    private boolean autopause;
     private WakeLock scrUnLock;
+    private WakeLock cpuUnLock;
+    private Button btnPause;
     private boolean hiitDone = false;
     
     private static enum HIITState { WORK, BREAK, REST };
@@ -57,6 +63,8 @@ public class HIITRun extends ActionBarActivity {
         public void pauseRunner() {
             runLoop = false;
         }
+
+        public boolean isPaused() { return !runLoop; }
         
         public void resumeRunner() {
             runLoop = true;
@@ -215,13 +223,8 @@ public class HIITRun extends ActionBarActivity {
             switch (m.what) {
 
             case 0:
-                // change UI to WORK
-                setContentView(R.layout.activity_hiitrun);
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
-                nSeconds = (TextView) findViewById(R.id.nSeconds);
-                nIntervals = (TextView) findViewById(R.id.nIntervals);
-                nBlocks = (TextView) findViewById(R.id.nBlocks);
                 // update values
+                findViewById(R.id.intervals_remaining).setVisibility(View.VISIBLE);
                 lLayout.setBackgroundColor(Color.GREEN);
                 nSeconds.setText(String.format("%d",workSeconds));
                 nIntervals.setText(String.format("%d",m.arg1));
@@ -236,14 +239,12 @@ public class HIITRun extends ActionBarActivity {
 
             case 2:
                 // change UI to REST
-                setContentView(R.layout.activity_hiitrun_rest);
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutRest);
-                nSeconds = (TextView) findViewById(R.id.nSecondsRest);
-                nBlocks = (TextView) findViewById(R.id.nBlocksRest);
                 // update values
                 lLayout.setBackgroundColor(Color.RED);
                 nSeconds.setText(String.format("%d",restSeconds));
                 nBlocks.setText(String.format("%d",m.arg2));
+                nIntervals.setText(R.string.rest_string);
+                findViewById(R.id.intervals_remaining).setVisibility(View.INVISIBLE);
                 break;
 
             case 3:
@@ -252,18 +253,11 @@ public class HIITRun extends ActionBarActivity {
                 break;
 
             case 4:
-                // change UI to done
-                setContentView(R.layout.activity_hiitrun_done);
-                lLayout = (LinearLayout) findViewById(R.id.hiitRunLayoutDone);
-                nSeconds = (TextView) findViewById(R.id.hiit_time_done);
-                hiitDone = true;
-                supportInvalidateOptionsMenu();
-                // update values
                 int workoutTime = (1 + blockCount) * restSeconds + blockCount * intervalCount * (workSeconds + breakSeconds);
-                lLayout.setBackgroundColor(Color.CYAN);
-                nSeconds.setText(String.format("%d:%02d",workoutTime/60,workoutTime%60));
-                // release screen lock, if held; we don't need this any more
-                if (scrUnLock.isHeld()) scrUnLock.release();
+                Intent intent = new Intent(HIITRun.this, HIITRunDone.class);
+                intent.putExtra("RESULT",String.format("%d:%02d",workoutTime/60,workoutTime%60));
+                finish();
+                startActivity(intent);
                 break;
             }
         }
@@ -276,10 +270,26 @@ public class HIITRun extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
+        // change UI to WORK
+        setContentView(R.layout.activity_hiitrun);
+        setSupportActionBar((Toolbar) findViewById(R.id.run_toolbar));
         // setup the action bar with a back button (compat version)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
+        //setupPauseButton();
+        lLayout = (LinearLayout) findViewById(R.id.hiitRunLayout);
+        nSeconds = (TextView) findViewById(R.id.nSeconds);
+        nIntervals = (TextView) findViewById(R.id.nIntervals);
+        nBlocks = (TextView) findViewById(R.id.nBlocks);
+        btnPause = (Button) findViewById(R.id.pause_button); //FIND THE BUTTON
+        btnPause.setOnClickListener(new View.OnClickListener() { //SET ON CLICK LISTENER
+            @Override
+            public void onClick(View v) {
+                doPause();
+            }
+        });
+
         // create the sound manager instance
         sndMan = new SoundManager(this);
         // load the sounds to initialize the sound manager
@@ -294,6 +304,7 @@ public class HIITRun extends ActionBarActivity {
         restSeconds = itt.getIntExtra(HIITMain.M_REST, Integer.parseInt(getString(R.string.rest_dflt)));
         intervalCount = itt.getIntExtra(HIITMain.M_INTV, Integer.parseInt(getString(R.string.intv_dflt)));
         blockCount = itt.getIntExtra(HIITMain.M_BLOCK, Integer.parseInt(getString(R.string.block_dflt)));
+        autopause = itt.getBooleanExtra(HIITMain.M_AUTOPAUSE, false);
 
         // make sure the screen stays on through the workout
         // this works, but always keeps the screen at 100% brightness
@@ -303,6 +314,12 @@ public class HIITRun extends ActionBarActivity {
                                   |PowerManager.ON_AFTER_RELEASE
                                   ,"org.jfet.batsHIIT.HIITRun.scrUnLock"
                                   );
+        scrUnLock.acquire();
+        if (!autopause) {
+            cpuUnLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                    ,"org.jfet.batsHIIT.HIITRun.cpuUnLock");
+            cpuUnLock.acquire();
+        }
 
         // create a handler for hiitRunner to send us UI updates
         uiHandler = new HIITUIHandler(Looper.getMainLooper());
@@ -318,45 +335,45 @@ public class HIITRun extends ActionBarActivity {
     // menu stuff
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (hiitDone) {
-            // inflate the premade menu
-            getMenuInflater().inflate(R.menu.hiitrun, menu);
-            // now connect the ShareActionProvider with our sharing intent
-            final MenuItem mItem = (MenuItem) menu.findItem(R.id.share_menu);
-            final ShareActionProvider sActPro = (ShareActionProvider) MenuItemCompat.getActionProvider(mItem);
-            sActPro.setShareIntent(getHIITIntent());
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
-    
+
     // onResume is what happens *just* before we start running the thread
     @Override
-    protected void onResume() { 
+    protected void onResume() {
         super.onResume();
-        // just before we start executing, make sure the screen never goes to sleep
-        if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
-        
-        // tell the Runner thread to continue
-        // no harm if it's already running and we do this
-        hiitRunner.resumeRunner();
-        synchronized (this) { notify(); }    // break it out of its wait();
+        if (autopause && hiitRunner.isPaused()) doPause();
     }
-    
+
     // onPause is always called when the activity is undisplayed
     // stop the counter thread here
     @Override
     protected void onPause() {
         super.onPause();
-        hiitRunner.pauseRunner();    // tell it to pause
-        hiitRunner.interrupt();        // cancel the current timeout, if any
-        // if there isn't a timeout, the exception will be raised without harm inside hangThread()
-
-        // just after we stop executing, release the screen lock
-        if (scrUnLock.isHeld()) scrUnLock.release();
+        if (autopause && !hiitRunner.isPaused()) doPause();
     }
-    
+
+    protected void doPause() {
+        if (!hiitRunner.isPaused()) {
+            hiitRunner.pauseRunner();    // tell it to pause
+            hiitRunner.interrupt();        // cancel the current timeout, if any
+            // if there isn't a timeout, the exception will be raised without harm inside hangThread()
+
+            // just after we stop executing, release the screen lock
+            if (scrUnLock.isHeld()) scrUnLock.release();
+            btnPause.setText(R.string.resume);
+        } else {
+            // just before we start executing, make sure the screen never goes to sleep
+            if (!scrUnLock.isHeld() & hiitRunner.isAlive()) scrUnLock.acquire();
+
+            // tell the Runner thread to continue
+            // no harm if it's already running and we do this
+            hiitRunner.resumeRunner();
+            synchronized (this) { notify(); }    // break it out of its wait();
+            btnPause.setText(R.string.pause);
+        }
+    }
+
     @Override protected void onDestroy() {
         super.onDestroy();
 
@@ -365,6 +382,8 @@ public class HIITRun extends ActionBarActivity {
         hiitRunner.resumeRunner();    // should not be necessary, but make sure it does not hang again
         hiitRunner.stopRunner();    // next time through any loop it will see this and kill itself
         synchronized (this) { notify(); }    // wake it up from its wait() so that it kills itself
+        scrUnLock.release();
+        if (!autopause) cpuUnLock.release();
     }
     
     @Override
@@ -376,19 +395,5 @@ public class HIITRun extends ActionBarActivity {
                     return true;
             }
             return super.onOptionsItemSelected(item);
-    }
-    
-    // create an intent for sharing our workout
-    // passed to the ShareActionProvider
-    private Intent getHIITIntent () {
-        final Intent itt = new Intent(android.content.Intent.ACTION_SEND);
-        itt.setType("text/plain");
-        itt.putExtra(Intent.EXTRA_SUBJECT,R.string.share_subject);
-        itt.putExtra(Intent.EXTRA_TEXT,String.format(
-                "%s %s %s",
-                getString(R.string.share_contents1),
-                nSeconds.getText().toString(),
-                getString(R.string.share_contents2)));
-        return itt;
     }
 }

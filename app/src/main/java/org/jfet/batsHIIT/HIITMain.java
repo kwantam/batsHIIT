@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -21,13 +23,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class HIITMain extends Activity {
+public class HIITMain extends AppCompatActivity {
     // keys for the intent we send to Run
     public static final String M_WORK = "org.jfet.batsHIIT.M_WORK";
     public static final String M_BREAK = "org.jfet.batsHIIT.M_BREAK";
     public static final String M_REST = "org.jfet.batsHIIT.M_REST";
     public static final String M_INTV = "org.jfet.batsHIIT.M_INTV";
     public static final String M_BLOCK = "org.jfet.batsHIIT.M_BLOCK";
+    public static final String M_AUTOPAUSE = "org.jfet.batsHIIT.M_AUTOPAUSE";
+    public static final String PREFS = "org.jfet.batsHIIT.PREFS";
     private EditText eWork;
     private EditText eBreak;
     private EditText eRest;
@@ -63,6 +67,8 @@ public class HIITMain extends Activity {
 
         // set up the view, populate the elements
         setContentView(R.layout.activity_hiitmain);
+        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
         eWork = (EditText) findViewById(R.id.edit_work);
         eBreak = (EditText) findViewById(R.id.edit_break);
         eRest = (EditText) findViewById(R.id.edit_rest);
@@ -159,6 +165,7 @@ public class HIITMain extends Activity {
         intent.putExtra(M_REST,iRest);
         intent.putExtra(M_INTV,iIntv);
         intent.putExtra(M_BLOCK,iBlock);
+        intent.putExtra(M_AUTOPAUSE,getSharedPreferences(PREFS, 0).getBoolean(M_AUTOPAUSE, false));
 
         // if we got here, these settings are reasonably sensible
         saveSettings(getString(R.string.lastWorkout));
@@ -252,13 +259,19 @@ public class HIITMain extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.hiitmain, menu);
+        menu.findItem(R.id.action_autopause).setChecked(getSharedPreferences(PREFS, 0).getBoolean(M_AUTOPAUSE, false));
         return true;
     }
     
     @Override
     public boolean onOptionsItemSelected (MenuItem mi) {
         super.onOptionsItemSelected(mi);    // call this first; it will fall through to us
-        showHelpDialog();
+        if (mi.getItemId() == R.id.action_help) {
+            showHelpDialog();
+        } else {
+            mi.setChecked(!mi.isChecked());
+            getSharedPreferences(PREFS, 0).edit().putBoolean(M_AUTOPAUSE, mi.isChecked()).commit();
+        }
         return true;
     }
     
